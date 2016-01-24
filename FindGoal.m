@@ -22,7 +22,7 @@ function [ Dest ] = FindGoal( Vehicle, Packages, Goals, P, M )
     PossibleDestinations = setdiff(PossibleDestinations,Goals);
 
     if length(PossibleDestinations) == 0
-       Dest = 0
+       Dest = 0;
     else
        PosMat =  repmat(Vehicle.position, 1, length(PossibleDestinations));
         Distances = ManhattenDistance(PossibleDestinations, PosMat, M);
