@@ -22,6 +22,6 @@ function [ G ] = GridGraphGenerator( m )
     G = graph(A);
 
     while numnodes(G) > m 
-        G = rmnode(G, 1);   
+        G = rmnode(G, numnodes(G));   
     end
 end
