@@ -1,7 +1,7 @@
-M = 100;
+M = 20;
 N = 2;
 K = 3;
-P = 2;
+P = 1;
 
 if(M < N*2 + 1)
    error('not enough locations for that many packages (M < N*2 + 1)'); 
@@ -21,7 +21,7 @@ for turn=1:5
     for i=1:length(Vehicles)
         if Vehicles(i).goal ~= 0
             %update position
-            Vehicles(i).position = Vehicles(i).goal;
+            Vehicles(i).position = FindNextMove(Vehicles(i).position,  Vehicles(i).goal, G, M);
 
             %move carried packages
             for j=1:length(Vehicles(i).packages)
@@ -32,13 +32,13 @@ for turn=1:5
             if Vehicles(i).position == Vehicles(i).goal
                 %attempt to pick up package
                 idx = find([Packages.position] == Vehicles(i).position & [Packages.claimed] == 0);
-                if length(idx) ~= 0
+                if ~isempty(idx)
                     thisPackage = Packages(idx);
                     Packages(idx).claimed = true;
                     holdingCount = length(Vehicles(i).packages);
                     Vehicles(i).packages(holdingCount+1) = idx;
                 else
-                    %%attempt to drop off package
+                    %attempt to drop off package
                     dropIdx = find([Packages.destination] == Vehicles(i).position);
                     Vehicles(i).packages = setdiff(Vehicles(i).packages, dropIdx);
                 end
