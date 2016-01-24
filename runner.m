@@ -16,8 +16,11 @@ for i=1:length(Vehicles)
     Vehicles(i).goal = FindGoal( Vehicles(i), Packages, [Vehicles(:).goal], P, M );
 end
 
-for turn=1:5
-    pause(0.5);
+done = false;
+turn = 0;
+while ~done
+    turn = turn + 1;
+    pause(0.00001);
     for i=1:length(Vehicles)
         if Vehicles(i).goal ~= 0
             %update position
@@ -52,5 +55,9 @@ for turn=1:5
         end
     end
     DisplayMap(G, Vehicles, Packages, GaragePt);
+    done = isComplete(Vehicles, Packages, GaragePt);
 end
+
+output = ['finished in ', num2str(turn),' turns'];
+disp(output);
 

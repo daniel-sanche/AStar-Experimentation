@@ -9,7 +9,7 @@ thisNode = repmat(Position, length(nextNodes), 1);
 Edges = findedge(G,thisNode,nextNodes);
 Weight = G.Edges.Weight(Edges);
 
-TotalCost = Distances + Weight
+TotalCost = Distances + Weight;
 
 [~, idx] = min(TotalCost);
 
