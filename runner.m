@@ -3,6 +3,8 @@ N = 2;
 K = 5;
 P = 2;
 
+javaaddpath('./javatuples-1.2.jar');
+
 if(M < N*2 + 1)
    error('not enough locations for that many packages (M < N*2 + 1)'); 
 end
