@@ -3,7 +3,7 @@ function [ Vehicles, Packages, Garage  ] = InitPositions( G, N, K )
     nodeCount = numnodes(G);
 
     startPoint = randi([1 nodeCount],1,1);
-    Vehicles = struct('position', repmat({startPoint}, N, 1));
+    Vehicles = struct('position', repmat({startPoint}, N, 1), 'packages', repmat({[]}, N, 1), 'goal', repmat({0}, N, 1));
     %create vehicles
 
     Packages = struct;
@@ -18,6 +18,7 @@ function [ Vehicles, Packages, Garage  ] = InitPositions( G, N, K )
         end
        Packages(i).startPt =  rand1;
        Packages(i).endPt =  rand2;
+       Packages(i).claimed =  false;
     end
 
     Garage = startPoint;
