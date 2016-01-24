@@ -1,4 +1,4 @@
-function [ G ] = GridGraphGenerator( m )
+function [ G ] = GridGraphGenerator( m, weightRange )
 
     n = ceil(sqrt(m));
 
@@ -6,16 +6,19 @@ function [ G ] = GridGraphGenerator( m )
 
     for i=1:n:n*n
         for j=i:i+n-2
-            A(j, j+1) = 1;
-            A(j+1, j) = 1;
+            weight = randi(weightRange,1,1);
+            A(j, j+1) = weight;
+            A(j+1, j) = weight;
             if j+n < n*n
-                A(j, j+n) = 1;
-                A(j+n, j) = 1;
+                weight = randi(weightRange,1,1);
+                A(j, j+n) = weight;
+                A(j+n, j) = weight;
             end
         end
         if i>1
-        A(i-1, i-1+n) = 1;
-        A(i-1+n, i-1) = 1;
+            weight = randi(weightRange,1,1);
+            A(i-1, i-1+n) = weight;
+            A(i-1+n, i-1) = weight;
         end
     end
 

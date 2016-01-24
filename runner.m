@@ -1,13 +1,13 @@
 M = 20;
 N = 2;
-K = 3;
-P = 1;
+K = 5;
+P = 2;
 
 if(M < N*2 + 1)
    error('not enough locations for that many packages (M < N*2 + 1)'); 
 end
 
-G = GridGraphGenerator(M);
+G = GridGraphGenerator(M, [1 4]);
 [ Vehicles, Packages, GaragePt  ] = InitPositions(G, N, K);
 DisplayMap(G, Vehicles, Packages, GaragePt);
 
@@ -20,7 +20,7 @@ done = false;
 turn = 0;
 while ~done
     turn = turn + 1;
-    pause(0.00001);
+    pause(0.1);
     for i=1:length(Vehicles)
         if Vehicles(i).goal ~= 0
             %update position
