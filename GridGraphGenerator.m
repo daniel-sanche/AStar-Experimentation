@@ -1,4 +1,4 @@
-function [ G ] = GridGraphGenerator( m, weightRange )
+function [ G ] = GridGraphGenerator( m, weightRange, destructionFactor )
 
     n = ceil(sqrt(m));
 
@@ -26,5 +26,22 @@ function [ G ] = GridGraphGenerator( m, weightRange )
 
     while numnodes(G) > m 
         G = rmnode(G, numnodes(G));   
+    end
+    
+    %destroy edges according to destructionFactor
+    if destructionFactor ~= 0 
+        i=1;
+        while i< numedges(G)
+            i = i+1;
+            randomNumber = rand
+            if randomNumber < destructionFactor
+               GPrime = rmedge(G, i);
+               numComponents = max(conncomp(GPrime));
+               if numComponents == 1
+                   G = GPrime;
+                   i = i-1;
+               end
+            end
+        end
     end
 end
