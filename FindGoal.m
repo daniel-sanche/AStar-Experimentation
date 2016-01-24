@@ -7,14 +7,15 @@ function [ Dest ] = FindGoal( Vehicle, Packages, Goals, P, M )
     for i=1:holdingCount
        packageIdx = Vehicle.packages(i);
        package = Packages(packageIdx);
-       endPt = package.endPt;
+       endPt = package.destination;
        PossibleDestinations = [PossibleDestinations, endPt];
     end
 
     %if we have room to carry more, add the positions of 
     %remaining packages to the list
     if holdingCount < P
-        PossibleDestinations = [PossibleDestinations, [Packages(:).startPt]];
+        UnclaimedIdx = find([Packages.claimed] == 0)
+        PossibleDestinations = [PossibleDestinations, [Packages(UnclaimedIdx).position]];
     end
 
     %remove packages that are already the goal of another vehicle

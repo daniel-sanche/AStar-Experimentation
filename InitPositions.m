@@ -16,8 +16,8 @@ function [ Vehicles, Packages, Garage  ] = InitPositions( G, N, K )
         while rand2 == startPoint || rand2 == rand1
             rand2 = randi([1 nodeCount],1,1);
         end
-       Packages(i).startPt =  rand1;
-       Packages(i).endPt =  rand2;
+       Packages(i).position =  rand1;
+       Packages(i).destination =  rand2;
        Packages(i).claimed =  false;
     end
 
