@@ -1,4 +1,4 @@
-M = 6;
+M = 14;
 N = 2;
 K = 2;
 P = 2;
@@ -16,11 +16,14 @@ for i=1:length(Vehicles)
     Vehicles(i).goal = FindGoal( Vehicles(i), Packages, [Vehicles(:).goal], P, M );
 end
 
-%{
-for i=1:length(Vehicles)
-    Vehicles(i).position = Vehicles(i).goal
 
-    %reached goal. Preform action
+for i=1:length(Vehicles)
+    %update position
+    Vehicles(i).position = Vehicles(i).goal;
+    
+    %move carried packages
+
+    %if reached goal, Preform action
     if Vehicles(i).position == Vehicles(i).goal
         %attempt to pick up package
         idx = find([Packages.position] == Vehicles(i).position & [Packages.claimed] == 0);
@@ -44,4 +47,4 @@ for i=1:length(Vehicles)
     end
 end
 DisplayMap(G, Vehicles, Packages, GaragePt);
-%}
+
