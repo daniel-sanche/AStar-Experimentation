@@ -14,12 +14,12 @@ function [ Dest ] = FindGoal( Vehicle, Packages, Goals, P, M )
     %if we have room to carry more, add the positions of 
     %remaining packages to the list
     if holdingCount < P
-        UnclaimedIdx = find([Packages.claimed] == 0)
+        UnclaimedIdx = find([Packages.claimed] == 0);
         PossibleDestinations = [PossibleDestinations, [Packages(UnclaimedIdx).position]];
     end
 
     %remove packages that are already the goal of another vehicle
-    PossibleDestinations = setdiff(PossibleDestinations,Goals)
+    PossibleDestinations = setdiff(PossibleDestinations,Goals);
 
     if length(PossibleDestinations) == 0
        Dest = 0

@@ -1,7 +1,11 @@
-M = 14;
+M = 6;
 N = 2;
 K = 2;
-P = 2
+P = 2;
+
+if(M < N*2 + 1)
+   error('not enough locations for that many packages (M < N*2 + 1)'); 
+end
 
 G = GridGraphGenerator(M);
 [ Vehicles, Packages, GaragePt  ] = InitPositions(G, N, K);
@@ -12,6 +16,7 @@ for i=1:length(Vehicles)
     Vehicles(i).goal = FindGoal( Vehicles(i), Packages, [Vehicles(:).goal], P, M );
 end
 
+%{
 for i=1:length(Vehicles)
     Vehicles(i).position = Vehicles(i).goal
 
@@ -39,3 +44,4 @@ for i=1:length(Vehicles)
     end
 end
 DisplayMap(G, Vehicles, Packages, GaragePt);
+%}
