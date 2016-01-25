@@ -1,6 +1,6 @@
-M = 40;
-N = 2;
-K = 5;
+M = 100;
+N = 3;
+K = 20;
 P = 2;
 
 javaaddpath('./javatuples-1.2.jar');
@@ -9,23 +9,30 @@ if(M < N*2 + 1)
    error('not enough locations for that many packages (M < N*2 + 1)'); 
 end
 
-%G = GridGraphGenerator(M, [1 4], 0);
+G = GridGraphGenerator(M, [1 4], 0);
 [ Vehicles, Packages, GaragePt  ] = InitPositions(G, N, K);
 DisplayMap(G, Vehicles, Packages, GaragePt);
 
 done = false;
 turn = 0;
+totalCost = 0;
 while ~done
     turn = turn + 1;
-    pause(0.1);
+    pause(0.001);
     for i=1:length(Vehicles)
         newGoal = false;
         if Vehicles(i).goal ~= 0
             %update position
             path = Vehicles(i).path;
+            oldPos = Vehicles(i).position;
             Vehicles(i).position = path(1);
             Vehicles(i).path = path(2:length(path));
-
+            
+            edge = findedge(G,oldPos,Vehicles(i).position);
+            weight = G.Edges.Weight(edge);
+            Vehicles(i).cost = Vehicles(i).cost - weight;
+            totalCost = totalCost + weight;
+            
             %move carried packages
             for j=1:length(Vehicles(i).packages)
                 Packages(Vehicles(i).packages(j)).position = Vehicles(i).position; 
@@ -71,6 +78,6 @@ while ~done
     done = isComplete(Vehicles, Packages, GaragePt);
 end
 
-output = ['finished in ', num2str(turn),' turns'];
+output = ['finished in ', num2str(turn),' turns with cost ', num2str(totalCost) ];
 disp(output);
 
