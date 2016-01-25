@@ -1,7 +1,6 @@
 function [ path, cost ] = AStar( Position, Destination, G, M )
     [path, cost] = AStarHelper(Position, Destination, G, M, java.util.PriorityQueue, [], 0, 0);
     path = path(3:length(path));
-    plot(G, 'EdgeLabel',G.Edges.Weight);
 end
 
 function [ path, cost ] = AStarHelper( Position, Destination, G, M, Queue, Visited, Previous, costToPoint )
@@ -20,7 +19,7 @@ function [ path, cost ] = AStarHelper( Position, Destination, G, M, Queue, Visit
 
         TotalCost = Distances + Weight;
         for i=1:length(TotalCost)
-           trip= org.javatuples.Triplet(TotalCost(i) + costToPoint,nextNodes(i),Position);
+           trip= org.javatuples.Quartet(TotalCost(i) + costToPoint,nextNodes(i),Position, Weight(i));
            Queue.add(trip);
         end
 
@@ -31,9 +30,8 @@ function [ path, cost ] = AStarHelper( Position, Destination, G, M, Queue, Visit
             if ~any(Visited == nextNumber)
                 foundNext = true;
             end
-        end
-        Edge = findedge(G,nextVisit.getValue2,nextNumber);
-        Weight = G.Edges.Weight(Edge);
+        end        
+        Weight = nextVisit.getValue3;
         
         [path, cost] = AStarHelper( nextNumber, Destination, G, M, Queue, Visited, nextVisit.getValue2, costToPoint+Weight);
         if any(path == Position) 
