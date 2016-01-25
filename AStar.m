@@ -10,17 +10,19 @@ function [ path, cost ] = AStarHelper( Position, Destination, G, M, Queue, Visit
             cost = costToPoint;
     else 
         nextNodes = setdiff(neighbors(G, Position), Visited);
-        destNode = repmat(Destination, length(nextNodes), 1);
-        Distances = ManhattenDistance(destNode, nextNodes, M);
+        if length(nextNodes) ~= 0
+            destNode = repmat(Destination, length(nextNodes), 1);
+            Distances = ManhattenDistance(destNode, nextNodes, M);
 
-        thisNode = repmat(Position, length(nextNodes), 1);
-        Edges = findedge(G,thisNode,nextNodes);
-        Weight = G.Edges.Weight(Edges);
+            thisNode = repmat(Position, length(nextNodes), 1);
+            Edges = findedge(G,thisNode,nextNodes);
+            Weight = G.Edges.Weight(Edges);
 
-        TotalCost = Distances + Weight;
-        for i=1:length(TotalCost)
-           trip= org.javatuples.Quartet(TotalCost(i) + costToPoint,nextNodes(i),Position, Weight(i));
-           Queue.add(trip);
+            TotalCost = Distances + Weight;
+            for i=1:length(TotalCost)
+               trip= org.javatuples.Quartet(TotalCost(i) + costToPoint,nextNodes(i),Position, Weight(i));
+               Queue.add(trip);
+            end
         end
 
         foundNext = false;
@@ -32,7 +34,7 @@ function [ path, cost ] = AStarHelper( Position, Destination, G, M, Queue, Visit
             end
         end        
         Weight = nextVisit.getValue3;
-        
+
         [path, cost] = AStarHelper( nextNumber, Destination, G, M, Queue, Visited, nextVisit.getValue2, costToPoint+Weight);
         if any(path == Position) 
            path = [Previous, path];

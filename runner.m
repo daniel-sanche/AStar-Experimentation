@@ -1,6 +1,6 @@
 M = 100;
-N = 3;
-K = 20;
+N = 5;
+K = 30;
 P = 2;
 
 javaaddpath('./javatuples-1.2.jar');
@@ -9,9 +9,8 @@ if(M < N*2 + 1)
    error('not enough locations for that many packages (M < N*2 + 1)'); 
 end
 
-G = GridGraphGenerator(M, [1 4], 0);
+G = GridGraphGenerator(M, [1 20], 0.05);
 [ Vehicles, Packages, GaragePt  ] = InitPositions(G, N, K);
-DisplayMap(G, Vehicles, Packages, GaragePt);
 
 done = false;
 turn = 0;

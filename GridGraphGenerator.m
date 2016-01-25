@@ -33,7 +33,7 @@ function [ G ] = GridGraphGenerator( m, weightRange, destructionFactor )
         i=1;
         while i< numedges(G)
             i = i+1;
-            randomNumber = rand
+            randomNumber = rand;
             if randomNumber < destructionFactor
                GPrime = rmedge(G, i);
                numComponents = max(conncomp(GPrime));
