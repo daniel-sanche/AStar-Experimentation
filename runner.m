@@ -9,14 +9,9 @@ if(M < N*2 + 1)
    error('not enough locations for that many packages (M < N*2 + 1)'); 
 end
 
-G = GridGraphGenerator(M, [1 4], 0.05);
+%G = GridGraphGenerator(M, [1 4], 0);
 [ Vehicles, Packages, GaragePt  ] = InitPositions(G, N, K);
 DisplayMap(G, Vehicles, Packages, GaragePt);
-
-%initialize initial goals for each vehicle
-for i=1:length(Vehicles)
-    Vehicles(i).goal = FindGoal( Vehicles(i), Packages, [Vehicles(:).goal], P, M );
-end
 
 done = false;
 turn = 0;
@@ -24,9 +19,12 @@ while ~done
     turn = turn + 1;
     pause(0.1);
     for i=1:length(Vehicles)
+        newGoal = false;
         if Vehicles(i).goal ~= 0
             %update position
-            Vehicles(i).position = FindNextMove(Vehicles(i).position,  Vehicles(i).goal, G, M);
+            path = Vehicles(i).path;
+            Vehicles(i).position = path(1);
+            Vehicles(i).path = path(2:length(path));
 
             %move carried packages
             for j=1:length(Vehicles(i).packages)
@@ -47,13 +45,26 @@ while ~done
                     dropIdx = find([Packages.destination] == Vehicles(i).position);
                     Vehicles(i).packages = setdiff(Vehicles(i).packages, dropIdx);
                 end
-                %find new goal
-                Vehicles(i).goal = FindGoal( Vehicles(i), Packages, [Vehicles(:).goal], P, M );
-                %if there is nothing left to pick up, head back to the garage
-                if Vehicles(i).goal == 0 && Vehicles(i).position ~= GaragePt
-                    Vehicles(i).goal = GaragePt;
-                end
+                newGoal = true;
             end
+        else
+            newGoal = true;
+        end
+        if newGoal
+            %find new goal
+            Vehicles(i).goal = FindGoal( Vehicles(i), Packages, [Vehicles(:).goal], P, M );
+            %if there is nothing left to pick up, head back to the garage
+            if Vehicles(i).goal == 0 && Vehicles(i).position ~= GaragePt
+                Vehicles(i).goal = GaragePt;
+            end
+            if( Vehicles(i).goal ~= 0)
+               [path, cost] = AStar(Vehicles(i).position, Vehicles(i).goal, G, M);
+                Vehicles(i).path = path;
+                Vehicles(i).cost = cost;
+             else 
+                 Vehicles(i).path = 0;
+                 Vehicles(i).cost = 0;
+             end
         end
     end
     DisplayMap(G, Vehicles, Packages, GaragePt);
