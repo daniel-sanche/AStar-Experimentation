@@ -36,7 +36,7 @@ function [ path, cost ] = AStarHelper( Vehicles, Packages, Garage, G, M, Queue)
         
         %remove all rows with a 0
         CombinedOptions = CombinedOptions(all(CombinedOptions,2),:);
-        Values = HeuristicValues(CombinedOptions);
+        Values = HeuristicValues(CombinedOptions, Packages, Garage);
         
         
         nextNodes = setdiff(neighbors(G, Position), Visited);
@@ -73,7 +73,7 @@ function [done] = reachedGoal(Vehicles, Packages, Garage)
     done = false;
 end
 
-function [values] = HeuristicValues(optionsArray)
+function [values] = HeuristicValues(newPositionsArray, Pacakges, Garage)
 
 
 end
