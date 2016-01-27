@@ -7,8 +7,8 @@ end
 
 function [ path, cost ] = AStarHelper( Vehicles, Packages, Garage, G, M, Queue)
     if(reachedGoal(Vehicles, Packages, Garage))
-            path = [Previous, Destination];
-            cost = costToPoint;
+            path = 1;
+            cost = 1;
     else 
         numVehicles = length(Vehicles);
         %add new options to the queue
@@ -36,10 +36,11 @@ function [ path, cost ] = AStarHelper( Vehicles, Packages, Garage, G, M, Queue)
         
         %remove all rows with a 0
         CombinedOptions = CombinedOptions(all(CombinedOptions,2),:);
+        Values = HeuristicValues(CombinedOptions);
         
         
         nextNodes = setdiff(neighbors(G, Position), Visited);
-        if length(nextNodes) ~= 0
+        if ~isempty(nextNodes)
             destNode = repmat(Destination, length(nextNodes), 1);
             Distances = ManhattenDistance(destNode, nextNodes, M);
 
@@ -65,14 +66,16 @@ function [ path, cost ] = AStarHelper( Vehicles, Packages, Garage, G, M, Queue)
         Weight = nextVisit.getValue3;
 
         [path, cost] = AStarHelper( nextNumber, Destination, G, M, Queue, Visited, nextVisit.getValue2, costToPoint+Weight);
-        if any(path == Position) 
-           path = [Previous, path];
-        end
     end
 end
 
 function [done] = reachedGoal(Vehicles, Packages, Garage)
     done = false;
+end
+
+function [values] = HeuristicValues(optionsArray)
+
+
 end
 
 
