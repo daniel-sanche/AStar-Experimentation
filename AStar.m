@@ -1,27 +1,24 @@
 function [ path, cost ] = AStar( Vehicles, Packages, Garage, G, M )
-    GMat = adjacency(G);
     DisplayMap(G, Vehicles, Packages, Garage);
-    [path, cost] = AStarHelper(Vehicles, Packages, Garage, G, M, java.util.PriorityQueue);
-    path = path(3:length(path));
-end
+    
+    numVehicles = length(Vehicles);
+    %add new options to the queue
 
-function [ path, cost ] = AStarHelper( Vehicles, Packages, Garage, G, M, Queue)
-    if(reachedGoal(Vehicles, Packages, Garage))
-            path = 1;
-            cost = 1;
-    else 
-        numVehicles = length(Vehicles);
-        %add new options to the queue
+    PriorityQueue = [0, 0, [Vehicles.position]];
+    for turn=1:10
+        %take the first choice off the queue
+        ChosenPositions = PriorityQueue(1,3:numVehicles+2);
+        CostToHere = PriorityQueue(1,2);
+        PriorityQueue(1,:) = [];
         
         CombinedOptions = zeros(4 ^ numVehicles, numVehicles);
         for i=1:numVehicles
-           thisVehicle = Vehicles(i); 
            successorsFull = zeros(4,1);
-           successors = neighbors(G, thisVehicle.position);
+           successors = neighbors(G, ChosenPositions(i));
            successorsFull(1:length(successors),1) = successors;
            eachNumSize = 4^(numVehicles-i);
            numBlocks = 4 ^ (i-1);
-          
+
            startPos = 1;
            for k=1:numBlocks
                 for j=1:4
@@ -32,41 +29,17 @@ function [ path, cost ] = AStarHelper( Vehicles, Packages, Garage, G, M, Queue)
                 end
            end
         end
-        
-        
         %remove all rows with a 0
         CombinedOptions = CombinedOptions(all(CombinedOptions,2),:);
         Values = HeuristicValues(CombinedOptions, Packages, Garage, M);
-        
-        
-        nextNodes = setdiff(neighbors(G, Position), Visited);
-        if ~isempty(nextNodes)
-            destNode = repmat(Destination, length(nextNodes), 1);
-            Distances = ManhattenDistance(destNode, nextNodes, M);
+        Values = Values + CostToHere + 1;
+        CostToPointVector = repmat(CostToHere + 1, length(Values), 1);
 
-            thisNode = repmat(Position, length(nextNodes), 1);
-            Edges = findedge(G,thisNode,nextNodes);
-            Weight = G.Edges.Weight(Edges);
-
-            TotalCost = Distances + Weight;
-            for i=1:length(TotalCost)
-               trip= org.javatuples.Quartet(TotalCost(i) + costToPoint,nextNodes(i),Position, Weight(i));
-               Queue.add(trip);
-            end
-        end
-
-        foundNext = false;
-        while ~foundNext
-            nextVisit = Queue.remove;
-            nextNumber = nextVisit.getValue1;
-            if ~any(Visited == nextNumber)
-                foundNext = true;
-            end
-        end        
-        Weight = nextVisit.getValue3;
-
-        [path, cost] = AStarHelper( nextNumber, Destination, G, M, Queue, Visited, nextVisit.getValue2, costToPoint+Weight);
+        %add to priority queue
+        PriorityQueue(length(PriorityQueue)+1:length(PriorityQueue)+length(Values),:) = [Values, CostToPointVector, CombinedOptions];
+        PriorityQueue = sortrows(PriorityQueue);
     end
+
 end
 
 function [done] = reachedGoal(Vehicles, Packages, Garage)
@@ -83,7 +56,7 @@ function [values] = HeuristicValues(newPositionsArray, Pacakges, Garage, M)
     packagePositions = repmat(packagePositions, rows,cols,1);
     vehiclePositions = repmat(newPositionsArray, 1,1,length(Pacakges));
     
-    distances = ManhattenDistance(vehiclePositions, packagePositions, M)
+    distances = ManhattenDistance(vehiclePositions, packagePositions, M);
     
     %this tells us the minimum distance to each package (3rd d) for each
     %potential move (1st D)
