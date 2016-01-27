@@ -36,7 +36,7 @@ function [ path, cost ] = AStarHelper( Vehicles, Packages, Garage, G, M, Queue)
         
         %remove all rows with a 0
         CombinedOptions = CombinedOptions(all(CombinedOptions,2),:);
-        Values = HeuristicValues(CombinedOptions, Packages, Garage);
+        Values = HeuristicValues(CombinedOptions, Packages, Garage, M);
         
         
         nextNodes = setdiff(neighbors(G, Position), Visited);
@@ -73,9 +73,24 @@ function [done] = reachedGoal(Vehicles, Packages, Garage)
     done = false;
 end
 
-function [values] = HeuristicValues(newPositionsArray, Pacakges, Garage)
-
-
+function [values] = HeuristicValues(newPositionsArray, Pacakges, Garage, M)
+    %create a 3d array. Each 3rd D stack represents the distance to a
+    %certain package. Each row represents a different decision option. Each column
+    %represents a different robot. For each decision, we want to find the
+    %sum of min distances from any robot to each package
+    [rows, cols] = size(newPositionsArray);
+    packagePositions = reshape([Pacakges.position],[1,1,length([Pacakges.position])]);
+    packagePositions = repmat(packagePositions, rows,cols,1);
+    vehiclePositions = repmat(newPositionsArray, 1,1,length(Pacakges));
+    
+    distances = ManhattenDistance(vehiclePositions, packagePositions, M)
+    
+    %this tells us the minimum distance to each package (3rd d) for each
+    %potential move (1st D)
+    minDists = min(distances, [], 2);
+    %we add the two together to result in the total
+    sumDist = sum(minDists, 3);
+    values = sumDist;
 end
 
 
