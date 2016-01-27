@@ -5,7 +5,7 @@ function [ path, cost ] = AStar( Vehicles, Packages, Garage, G, M )
     %add new options to the queue
 
     PriorityQueue = [0, 0, Vehicles];
-    for turn=1:10
+    while ~reachedGoal(Vehicles, Packages, Garage)
         %take the first choice off the queue
         ChosenPositions = PriorityQueue(1,3:numVehicles+2);
         CostToHere = PriorityQueue(1,2);
@@ -44,6 +44,11 @@ end
 
 function [done] = reachedGoal(Vehicles, Packages, Garage)
     done = false;
+    if max(Vehicles - Garage) == 0 
+        if max([Packages.position] - [Packages.destination]) == 0
+            done = true; 
+        end
+    end
 end
 
 function [values] = HeuristicValues(newPositionsArray, Pacakges, Garage, M)
