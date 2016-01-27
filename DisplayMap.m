@@ -1,6 +1,7 @@
 function [  ] = DisplayMap( G, Vehicles, Packages, Garage )
 
-h = plot(G, 'EdgeLabel',G.Edges.Weight, 'NodeLabel',{});
+%h = plot(G, 'EdgeLabel',G.Edges.Weight, 'NodeLabel',{});
+h = plot(G);
 
 UndeliveredIdx = find([Packages.destination] ~= [Packages.position]);
 UndeliveredPackages = Packages(UndeliveredIdx);
