@@ -32,11 +32,11 @@ function [ path, cost ] = AStar( Vehicles, Packages, Garage, G, M )
         %remove all rows with a 0
         CombinedOptions = CombinedOptions(all(CombinedOptions,2),:);
         Values = HeuristicValues(CombinedOptions, Packages, Garage, M);
-        Values = Values + CostToHere + 1;
+        %Values = Values + CostToHere + 1;
         CostToPointVector = repmat(CostToHere + 1, length(Values), 1);
 
         %add to priority queue
-        PriorityQueue(length(PriorityQueue)+1:length(PriorityQueue)+length(Values),:) = [Values, CostToPointVector, CombinedOptions];
+        PriorityQueue(size(PriorityQueue,1)+1:size(PriorityQueue,1)+size(Values,1),:) = [Values, CostToPointVector, CombinedOptions];
         PriorityQueue = sortrows(PriorityQueue);
     end
 
