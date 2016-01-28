@@ -10,7 +10,7 @@ function [ Path, TotalCost ] = AStar( numVehicles, Packages, Garage, G, M, P )
     done = false;
     while ~done
         %take the first choice off the queue
-      %  HeuristicValue = PriorityQueue(1,1)
+        HeuristicValue = PriorityQueue(1,1);
         VehiclePositions = cell2mat(PriorityQueue(1,2));
         PackagesCarried = PriorityQueue{1,3};
         PackagePositions = PriorityQueue{1,4};
@@ -28,7 +28,6 @@ function [ Path, TotalCost ] = AStar( numVehicles, Packages, Garage, G, M, P )
             CombinedOptions = zeros(maxChoices ^ numVehicles, numVehicles);
             CombinedCarrying = cell(maxChoices ^ numVehicles, numVehicles);
             for i=1:numVehicles
-
                [newChoices, newCarryingList] = generateNewChoices(VehiclePositions(i), PackagesCarried{i}, PackagePositions, Garage, G, maxChoices, P);
 
                eachNumSize = maxChoices^(numVehicles-i);
@@ -54,6 +53,7 @@ function [ Path, TotalCost ] = AStar( numVehicles, Packages, Garage, G, M, P )
             NewPackagePositions = UpdatePackagePositions(CombinedOptions, CombinedCarrying, PackagePositions);
 
             Values = HeuristicValues(CombinedOptions, NewPackagePositions, CombinedCarrying, [Packages.destination], Garage, M);
+            Values = Values + TotalCost;
             %Values = Values + CostToHere + 1;
 
             %add to priority queue
@@ -104,8 +104,12 @@ function [newChoices, newCarry] = generateNewChoices(CurrentPosition, PackagesCa
     PackagesAtPosition = setdiff(PackagesAtPosition, PackagesCarried);
     if(~isempty(PackagesAtPosition) && numel(PackagesCarried) < P)
         newChoices(6) = CurrentPosition;
+        if numel(PackagesAtPosition) > 1
+            PackagesAtPosition
+        end
         newCarry{6} = [PackagesCarried, PackagesAtPosition];
     end
+    PackagesCarried
     
     %add option to drop package if you're carrying one
     for i=1:numel(PackagesCarried)
@@ -178,6 +182,8 @@ function [values] = HeuristicValues(newPositionsArray, packagePositions, Package
     DestsToGarage(InPosition==1) = 0;
 
     MaxDist = [max(DestsToGarage, [], 2), max(PackagesToGarage,[],2), CarsToGarage];
+    
+    FinalHeuristic = [sum(minDists, 2), sum(NeedPickup, 2), sum(DistToDest, 2), sum(DropCost,2), max(MaxDist, [], 2)];
     
     values = sum(minDists, 2) + sum(NeedPickup, 2) + sum(DistToDest, 2) + sum(DropCost,2) + max(MaxDist, [], 2);
 end
