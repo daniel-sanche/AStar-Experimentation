@@ -166,8 +166,9 @@ function [values] = HeuristicValues(newPositionsArray, packagePositions, Package
     GarageFormatted = repmat(Garage, size(newPositionsArray));
     DistToGarage = ManhattenDistance(GarageFormatted, newPositionsArray, M);
     DistToGarage = DistToGarage * 0.1;
+
     
-    values = sum(minDists, 2) + sum(NeedPickup, 2) + sum(DistToDest, 2) + sum(DropCost,2) + sum(DistToGarage,2);
+    values = sum(minDists, 2) + sum(NeedPickup, 2) + sum(DistToDest, 2) + sum(DropCost,2) + max(DistToGarage, [] ,2);
 end
 
 function [NewPositions] = UpdatePackagePositions(VehiclePos, Carrying, OldPos)
