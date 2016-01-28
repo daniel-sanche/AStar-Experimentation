@@ -71,11 +71,8 @@ end
 function [done] = reachedGoal(Vehicles, PackagesPos, PackageDest, PackagesCarried, Garage)
     done = false;
     
-    numPackages = numel(PackagesPos);
-    [~, numCarried] = cellfun(@size, PackagesCarried);
-    numCarried = sum(numCarried,2);
-    if numCarried == numPackages
-        done = true;
+    if max(abs(PackagesPos - PackageDest)) == 0
+            done = true; 
     end
     
    %{ 
@@ -137,9 +134,12 @@ function [values] = HeuristicValues(newPositionsArray, packagePositions, Package
     totalPackages = repmat(numPackages, rows, 1);
     numNotPickedUp = totalPackages - numCarried - numDelivered;
     
+    %we also want to add in the distance between the packages and their
+    %destination
+    DistToDest = ManhattenDistance(destinationsFormated, packagePositions, M);
+    DistToDest = sum(DistToDest, 2)
     
-    
-    values = sumDist + numNotPickedUp;
+    values = sumDist + numNotPickedUp + DistToDest;
 end
 
 function [NewPositions] = UpdatePackagePositions(VehiclePos, Carrying, OldPos)
