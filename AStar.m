@@ -9,7 +9,7 @@ function [ path, cost ] = AStar( Vehicles, Packages, Garage, G, M, P )
     
     %add new options to the queue
 
-    PriorityQueue = [0, {Vehicles}, {repmat({[]}, numVehicles, 1)}, {[Packages.position]}];
+    PriorityQueue = [0, {Vehicles}, {repmat({[]}, 1, numVehicles)}, {[Packages.position]}];
     while ~reachedGoal(Vehicles, Packages, Garage)
         %take the first choice off the queue
         VehiclePositions = cell2mat(PriorityQueue(1,2));
@@ -18,6 +18,7 @@ function [ path, cost ] = AStar( Vehicles, Packages, Garage, G, M, P )
         PriorityQueue(1,:) = [];
         
         CombinedOptions = zeros(maxChoices ^ numVehicles, numVehicles);
+        CombinedCarrying = cell(maxChoices ^ numVehicles, numVehicles);
         for i=1:numVehicles
             
            [newChoices, newCarryingList] = generateNewChoices(VehiclePositions(i), PackagesCarried{i}, PackagePositions, G, maxChoices, P);
@@ -31,12 +32,15 @@ function [ path, cost ] = AStar( Vehicles, Packages, Garage, G, M, P )
                     %fill the block's space with the numbers repeated as
                     %many times as will fit
                     CombinedOptions(startPos:startPos+eachNumSize-1,i) = newChoices(j);
+                    CombinedCarrying(startPos:startPos+eachNumSize-1,i) = newCarryingList(i);
                     startPos = startPos+eachNumSize;
                 end
            end
         end
         %remove all rows with a 0
-        CombinedOptions = CombinedOptions(all(CombinedOptions,2),:);
+        RowsWithZeros = all(CombinedOptions,2);
+        CombinedOptions = CombinedOptions(RowsWithZeros,:);
+        CombinedCarrying = CombinedCarrying(RowsWithZeros,:);
         Values = HeuristicValues(CombinedOptions, Packages, Garage, M);
         %Values = Values + CostToHere + 1;
 
@@ -45,6 +49,7 @@ function [ path, cost ] = AStar( Vehicles, Packages, Garage, G, M, P )
         newLength = currentLength + size(Values,1);
         PriorityQueue(currentLength+1:newLength,1) = num2cell(Values);
         PriorityQueue(currentLength+1:newLength,2) = num2cell(CombinedOptions, 2);
+        PriorityQueue(currentLength+1:newLength,3) = num2cell(CombinedCarrying, 2);
         %sort the new queue
         [~, Index_A] = sort(cell2mat(PriorityQueue(:,1)));
         PriorityQueue = PriorityQueue(Index_A,:);
