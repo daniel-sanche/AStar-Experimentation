@@ -19,7 +19,7 @@ function [ path, cost ] = AStar( Vehicles, Packages, Garage, G, M, P )
         PriorityQueue(1,:) = [];
         
         % check to see if we've reached our goal
-        done = reachedGoal(VehiclePositions, PackagePositions, [Packages.destination], Garage);
+        done = reachedGoal(VehiclePositions, PackagePositions, [Packages.destination], PackagesCarried, Garage);
         if ~done
         
             CombinedOptions = zeros(maxChoices ^ numVehicles, numVehicles);
@@ -68,13 +68,23 @@ function [ path, cost ] = AStar( Vehicles, Packages, Garage, G, M, P )
 
 end
 
-function [done] = reachedGoal(Vehicles, PackagesPos, PackageDest, Garage)
+function [done] = reachedGoal(Vehicles, PackagesPos, PackageDest, PackagesCarried, Garage)
     done = false;
+    
+    numPackages = numel(PackagesPos);
+    [~, numCarried] = cellfun(@size, PackagesCarried);
+    numCarried = sum(numCarried,2);
+    if numCarried == numPackages
+        done = true;
+    end
+    
+   %{ 
     if max(Vehicles - Garage) == 0 
         if max(PackagesPos - PackageDest) == 0
             done = true; 
         end
-    end
+    end 
+    %}
 end
 
 function [newChoices, newCarry] = generateNewChoices(CurrentPosition, PackagesCarried, PackagePositions, G, maxSize, P)
