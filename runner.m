@@ -16,7 +16,7 @@ done = false;
 turn = 0;
 totalCost = 0;
 
-Cost = AStar( Vehicles, Packages, GaragePt, G, M, P )
+[Path, Cost] = AStar( N, Packages, GaragePt, G, M, P )
 
 output = ['finished in ', num2str(Cost),' turns' ];
 disp(output);
