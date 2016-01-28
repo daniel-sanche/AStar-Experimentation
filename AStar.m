@@ -10,13 +10,14 @@ function [ Path, TotalCost ] = AStar( numVehicles, Packages, Garage, G, M, P )
     done = false;
     while ~done
         %take the first choice off the queue
+        HeuristicValue = PriorityQueue(1,1)
         VehiclePositions = cell2mat(PriorityQueue(1,2));
         PackagesCarried = PriorityQueue{1,3};
         PackagePositions = PriorityQueue{1,4};
         TotalCost = PriorityQueue{1,5};
         Path = PriorityQueue{1,6};
-        DisplayMap( G, VehiclePositions, PackagePositions, [Packages.destination], Garage )
-        pause(0.01);
+      %  DisplayMap( G, VehiclePositions, PackagePositions, [Packages.destination], Garage )
+       % pause(0.01);
         PriorityQueue(1,:) = [];
         
         
@@ -164,11 +165,21 @@ function [values] = HeuristicValues(newPositionsArray, packagePositions, Package
     
     %track the distance from the garage to the vehicles
     GarageFormatted = repmat(Garage, size(newPositionsArray));
-    DistToGarage = ManhattenDistance(GarageFormatted, newPositionsArray, M);
-    DistToGarage = DistToGarage * 0.1;
-
+    CarsToGarage = ManhattenDistance(GarageFormatted, newPositionsArray, M);
     
-    values = sum(minDists, 2) + sum(NeedPickup, 2) + sum(DistToDest, 2) + sum(DropCost,2) + max(DistToGarage, [] ,2);
+    GarageFormatted = repmat(Garage, size(packagePositions));
+    PackagesToGarage = ManhattenDistance(GarageFormatted, packagePositions, M);
+    
+    DestsToGarage = ManhattenDistance(GarageFormatted, destinationsFormated, M);
+    %we don't want to consider the distances for packages or destinations
+    %where the package was already dropped off
+    PackagesToGarage(InPosition==1) = 0;
+    DestsToGarage(InPosition==1) = 0;
+
+    MaxDist = [max(DestsToGarage(:)), max(PackagesToGarage(:)), max(CarsToGarage(:))];
+    MaxDist = max(MaxDist);
+    
+    values = sum(minDists, 2) + sum(NeedPickup, 2) + sum(DistToDest, 2) + sum(DropCost,2) + MaxDist;
 end
 
 function [NewPositions] = UpdatePackagePositions(VehiclePos, Carrying, OldPos)
