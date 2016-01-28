@@ -130,7 +130,7 @@ function [values] = HeuristicValues(newPositionsArray, packagePositions, Package
     
     %we also want to add a cost for every package not being carried
     destinationsFormated = repmat(PackageDests, rows, 1);
-    posDiff = packagePositions - destinationsFormated
+    posDiff = packagePositions - destinationsFormated;
     numDelivered = sum((posDiff == 0),2);
     [~, numCarried] = cellfun(@size, PackagesCarried);
     numCarried = sum(numCarried,2);
@@ -142,9 +142,22 @@ function [values] = HeuristicValues(newPositionsArray, packagePositions, Package
     values = sumDist + numNotPickedUp;
 end
 
-function [NewPositions] = UpdatePackagePositions(CombinedOptions, CombinedCarrying, OldPositions)
-    numberOptions = size(CombinedOptions, 1);
-    NewPositions = repmat(OldPositions, numberOptions, 1);
+function [NewPositions] = UpdatePackagePositions(VehiclePos, Carrying, OldPos)
+    numberOptions = size(VehiclePos, 1);
+    NewPositions = repmat(OldPos, numberOptions, 1);
+    
+    [~, numCarried] = cellfun(@size, Carrying);
+    numCarried = sum(numCarried(:));
+    
+    if numCarried > 0
+        for i=1:numel(OldPos)
+            [row,col] = find(cellfun(@(x)ismember(i,x),Carrying))
+            for j=1:size(row,1)
+               newPos = VehiclePos(row(j),col(j));
+               NewPositions(row(j), i) = newPos;
+            end
+        end
+    end
 end
 
 
