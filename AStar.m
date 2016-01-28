@@ -125,21 +125,38 @@ function [values] = HeuristicValues(newPositionsArray, packagePositions, Package
     %we add the two together to result in the total
     sumDist = sum(minDists, 3);
     
-    %we also want to add a cost for every package not being carried
-    destinationsFormated = repmat(PackageDests, rows, 1);
-    posDiff = packagePositions - destinationsFormated;
-    numDelivered = sum((posDiff == 0),2);
+    %add a cost for not being dropped off at the right location
+    %(otherwise the vehicle will continue holding it)
     [~, numCarried] = cellfun(@size, PackagesCarried);
     numCarried = sum(numCarried,2);
-    totalPackages = repmat(numPackages, rows, 1);
-    numNotPickedUp = totalPackages - numCarried - numDelivered;
+    destinationsFormated = repmat(PackageDests, rows, 1);
+    posDiff = abs(packagePositions - destinationsFormated);
+    InPosition = (posDiff == 0);
+    
+    BeingCarried = zeros(rows, numPackages);
+    if sum(numCarried(:)) ~= 0
+        for i=1:numPackages
+            [r,~] = find(cellfun(@(x)ismember(i,x),PackagesCarried));
+            BeingCarried(r,i) = 1; 
+        end
+    end
+    DropCost = ones(rows,numPackages);
+    DropCost(InPosition + ~BeingCarried==2) = 0;
+    DropCost = sum(DropCost,2);
+    
+    
+    %we also want to add a cost for every package not being carried
+    NeedPickup = ones(rows,numPackages);
+    NeedPickup(BeingCarried==1) = 0;
+    NeedPickup(InPosition==1) = 0;
+    NeedPickup = sum(NeedPickup,2);
     
     %we also want to add in the distance between the packages and their
     %destination
     DistToDest = ManhattenDistance(destinationsFormated, packagePositions, M);
     DistToDest = sum(DistToDest, 2)
     
-    values = sumDist + numNotPickedUp + DistToDest;
+    values = sumDist + NeedPickup + DistToDest + DropCost;
 end
 
 function [NewPositions] = UpdatePackagePositions(VehiclePos, Carrying, OldPos)
