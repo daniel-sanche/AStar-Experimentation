@@ -16,6 +16,7 @@ function [ Path, TotalCost ] = AStar( numVehicles, Packages, Garage, G, M, P )
         TotalCost = PriorityQueue{1,5};
         Path = PriorityQueue{1,6};
         DisplayMap( G, VehiclePositions, PackagePositions, [Packages.destination], Garage )
+        pause(0.01);
         PriorityQueue(1,:) = [];
         
         
