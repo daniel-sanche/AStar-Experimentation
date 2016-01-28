@@ -108,18 +108,18 @@ function [values] = HeuristicValues(newPositionsArray, packagePositions, Package
     %sum of min distances from any robot to each package
     [rows, cols] = size(newPositionsArray);
     numPackages = size(packagePositions,2);
-    reshapedPackages = reshape(packagePositions,[rows,1,numPackages])
-    reshapedPackages = repmat(reshapedPackages, 1,cols,1)
+    reshapedPackages = reshape(packagePositions,[rows,1,numPackages]);
+    reshapedPackages = repmat(reshapedPackages, 1,cols,1);
     
     vehiclePositions = repmat(newPositionsArray, 1,1,numPackages);
     
     distances = ManhattenDistance(vehiclePositions, reshapedPackages, M);
     
-    %this tells us the minimum distance to each package (3rd d) for each
-    %potential move (1st D)
+    
+    %this tells us the minimum distance to each package for each
+    %potential move
     minDists = min(distances, [], 2);
-    %we add the two together to result in the total
-    sumDist = sum(minDists, 3);
+    minDists=reshape(minDists, size(minDists,1),numPackages);
     
     %add a cost for not being dropped off at the right location
     %(otherwise the vehicle will continue holding it)
@@ -138,21 +138,21 @@ function [values] = HeuristicValues(newPositionsArray, packagePositions, Package
     end
     DropCost = ones(rows,numPackages);
     DropCost(InPosition + ~BeingCarried==2) = 0;
-    DropCost = sum(DropCost,2);
-    
+ 
+    %if a package is at its destination, it doesn't matter how close it
+    %is to a vehicle
+    minDists(InPosition==1) = 0;
     
     %we also want to add a cost for every package not being carried
     NeedPickup = ones(rows,numPackages);
     NeedPickup(BeingCarried==1) = 0;
     NeedPickup(InPosition==1) = 0;
-    NeedPickup = sum(NeedPickup,2);
     
     %we also want to add in the distance between the packages and their
     %destination
     DistToDest = ManhattenDistance(destinationsFormated, packagePositions, M);
-    DistToDest = sum(DistToDest, 2)
     
-    values = sumDist + NeedPickup + DistToDest + DropCost;
+    values = sum(minDists, 2) + sum(NeedPickup, 2) + sum(DistToDest, 2) + sum(DropCost,2);
 end
 
 function [NewPositions] = UpdatePackagePositions(VehiclePos, Carrying, OldPos)
