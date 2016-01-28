@@ -1,6 +1,6 @@
-M = 20;
-N = 2;
-K = 2;
+M = 40;
+N = 4;
+K = 5;
 P = 1;
 
 javaaddpath('./javatuples-1.2.jar');
