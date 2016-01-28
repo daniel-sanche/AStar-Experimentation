@@ -69,15 +69,10 @@ function [ path, cost ] = AStar( Vehicles, Packages, Garage, G, M, P )
 end
 
 function [done] = reachedGoal(Vehicles, PackagesPos, PackageDest, PackagesCarried, Garage)
-    done = false;
-    
-    if max(abs(PackagesPos - PackageDest)) == 0
-            done = true; 
-    end
-    
+    done = false; 
    %{ 
     if max(Vehicles - Garage) == 0 
-        if max(PackagesPos - PackageDest) == 0
+        if max(abs(PackagesPos - PackageDest)) == 0
             done = true; 
         end
     end 
