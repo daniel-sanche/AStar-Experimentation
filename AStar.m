@@ -74,7 +74,11 @@ function [done] = reachedGoal(Vehicles, PackagesPos, PackageDest, PackagesCarrie
     done = false; 
     if max(Vehicles - Garage) == 0 
         if max(abs(PackagesPos - PackageDest)) == 0
-            done = true; 
+            [~, numCarried] = cellfun(@size, PackagesCarried);
+            numCarried = sum(numCarried,2);
+            if numCarried == 0
+                done = true; 
+            end
         end
     end 
 end
