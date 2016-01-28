@@ -10,7 +10,6 @@ function [ Path, TotalCost ] = AStar( numVehicles, Packages, Garage, G, M, P )
     done = false;
     while ~done
         %take the first choice off the queue
-        HeuristicValue = PriorityQueue(1,1);
         VehiclePositions = cell2mat(PriorityQueue(1,2));
         PackagesCarried = PriorityQueue{1,3};
         PackagePositions = PriorityQueue{1,4};
@@ -104,9 +103,6 @@ function [newChoices, newCarry] = generateNewChoices(CurrentPosition, PackagesCa
     PackagesAtPosition = setdiff(PackagesAtPosition, PackagesCarried);
     if(~isempty(PackagesAtPosition) && numel(PackagesCarried) < P)
         newChoices(6) = CurrentPosition;
-        if numel(PackagesAtPosition) > 1
-            PackagesAtPosition
-        end
         newCarry{6} = [PackagesCarried, PackagesAtPosition];
     end
     
@@ -184,9 +180,6 @@ function [values] = HeuristicValues(newPositionsArray, packagePositions, Package
     DestsToGarage(InPosition==1) = 0;
 
     MaxDist = [max(DestsToGarage, [], 2), max(PackagesToGarage,[],2), CarsToGarage];
-    
-    FinalHeuristic = [sum(minDists, 2), sum(NeedPickup, 2), sum(DistToDest, 2), sum(DropCost,2), max(MaxDist, [], 2)];
-    
     values = sum(minDists, 2) + sum(NeedPickup, 2) + sum(DistToDest, 2) + sum(DropCost,2) + max(MaxDist, [], 2);
 end
 
