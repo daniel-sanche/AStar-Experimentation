@@ -1,6 +1,6 @@
 M = 20;
-N = 1;
-K = 1;
+N = 2;
+K = 2;
 P = 1;
 
 javaaddpath('./javatuples-1.2.jar');
@@ -16,7 +16,7 @@ done = false;
 turn = 0;
 totalCost = 0;
 
-AStar( Vehicles, Packages, GaragePt, G, M )
+AStar( Vehicles, Packages, GaragePt, G, M, P )
 
 output = ['finished in ', num2str(turn),' turns with cost ', num2str(totalCost) ];
 disp(output);
