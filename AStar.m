@@ -99,10 +99,12 @@ function [newChoices, newCarry] = generateNewChoices(CurrentPosition, PackagesCa
     end
     
     %add option to pick up package if you're on one
-    idxOfPackageAtCurrentPos = find(PackagePositions==CurrentPosition);
-    if(~isempty(idxOfPackageAtCurrentPos) && isempty(find(PackagesCarried==idxOfPackageAtCurrentPos, 1)) && numel(PackagesCarried) < P)
+
+    PackagesAtPosition = find(PackagePositions==CurrentPosition);
+    PackagesAtPosition = setdiff(PackagesAtPosition, PackagesCarried);
+    if(~isempty(PackagesAtPosition) && numel(PackagesCarried) < P)
         newChoices(6) = CurrentPosition;
-        newCarry{6} = [PackagesCarried, idxOfPackageAtCurrentPos];
+        newCarry{6} = [PackagesCarried, PackagesAtPosition];
     end
     
     %add option to drop package if you're carrying one
@@ -125,7 +127,6 @@ function [values] = HeuristicValues(newPositionsArray, packagePositions, Package
     vehiclePositions = repmat(newPositionsArray, 1,1,numPackages);
     
     distances = ManhattenDistance(vehiclePositions, reshapedPackages, M);
-    
     
     %this tells us the minimum distance to each package for each
     %potential move
