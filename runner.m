@@ -16,8 +16,8 @@ done = false;
 turn = 0;
 totalCost = 0;
 
-AStar( Vehicles, Packages, GaragePt, G, M, P )
+Cost = AStar( Vehicles, Packages, GaragePt, G, M, P )
 
-output = ['finished in ', num2str(turn),' turns with cost ', num2str(totalCost) ];
+output = ['finished in ', num2str(Cost),' turns' ];
 disp(output);
 

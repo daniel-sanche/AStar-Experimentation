@@ -1,4 +1,4 @@
-function [ path, cost ] = AStar( Vehicles, Packages, Garage, G, M, P )    
+function [ TotalCost ] = AStar( Vehicles, Packages, Garage, G, M, P )    
     numVehicles = length(Vehicles);
     %the max number of options for choices each vehicle can make
     %move in any of 4 directions, stay still, pick up a package, or drop
@@ -7,13 +7,14 @@ function [ path, cost ] = AStar( Vehicles, Packages, Garage, G, M, P )
     
     %add new options to the queue
 
-    PriorityQueue = [0, {Vehicles}, {repmat({[]}, 1, numVehicles)}, {[Packages.position]}];
+    PriorityQueue = [0, {Vehicles}, {repmat({[]}, 1, numVehicles)}, {[Packages.position]}, {0}];
     done = false;
     while ~done
         %take the first choice off the queue
         VehiclePositions = cell2mat(PriorityQueue(1,2));
         PackagesCarried = PriorityQueue{1,3};
         PackagePositions = PriorityQueue{1,4};
+        TotalCost = PriorityQueue{1,5};
         DisplayMap( G, VehiclePositions, PackagePositions, [Packages.destination], Garage )
         PriorityQueue(1,:) = [];
         
@@ -60,6 +61,7 @@ function [ path, cost ] = AStar( Vehicles, Packages, Garage, G, M, P )
             PriorityQueue(currentLength+1:newLength,2) = num2cell(CombinedOptions, 2);
             PriorityQueue(currentLength+1:newLength,3) = num2cell(CombinedCarrying, 2);
             PriorityQueue(currentLength+1:newLength,4) = num2cell(NewPackagePositions, 2);
+            PriorityQueue(currentLength+1:newLength,5) = {TotalCost+1};
             %sort the new queue
             [~, Index_A] = sort(cell2mat(PriorityQueue(:,1)));
             PriorityQueue = PriorityQueue(Index_A,:);
