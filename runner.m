@@ -1,5 +1,5 @@
 M = 40;
-N = 4;
+N = 1;
 K = 5;
 P = 1;
 
@@ -9,7 +9,7 @@ if(M < N*2 + 1)
    error('not enough locations for that many packages (M < N*2 + 1)'); 
 end
 
-G = GridGraphGenerator(M, [1 20], 0.05);
+G = GridGraphGenerator(M, [1 20], 0);
 [ Vehicles, Packages, GaragePt  ] = InitPositions(G, N, K);
 
 done = false;
