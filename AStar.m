@@ -14,10 +14,9 @@ function [ path, cost ] = AStar( Vehicles, Packages, Garage, G, M, P )
         VehiclePositions = cell2mat(PriorityQueue(1,2));
         PackagesCarried = PriorityQueue{1,3};
         PackagePositions = PriorityQueue{1,4};
+        DisplayMap( G, VehiclePositions, PackagePositions, [Packages.destination], Garage )
         PriorityQueue(1,:) = [];
         
-        DisplayMap( G, VehiclePositions, PackagePositions, [Packages.destination], Garage )
-
         
         % check to see if we've reached our goal
         done = reachedGoal(VehiclePositions, PackagePositions, [Packages.destination], PackagesCarried, Garage);
@@ -71,13 +70,11 @@ end
 
 function [done] = reachedGoal(Vehicles, PackagesPos, PackageDest, PackagesCarried, Garage)
     done = false; 
-   %{ 
     if max(Vehicles - Garage) == 0 
         if max(abs(PackagesPos - PackageDest)) == 0
             done = true; 
         end
     end 
-    %}
 end
 
 function [newChoices, newCarry] = generateNewChoices(CurrentPosition, PackagesCarried, PackagePositions, G, maxSize, P)
@@ -152,7 +149,12 @@ function [values] = HeuristicValues(newPositionsArray, packagePositions, Package
     %destination
     DistToDest = ManhattenDistance(destinationsFormated, packagePositions, M);
     
-    values = sum(minDists, 2) + sum(NeedPickup, 2) + sum(DistToDest, 2) + sum(DropCost,2);
+    %track the distance from the garage to the vehicles
+    GarageFormatted = repmat(Garage, size(newPositionsArray));
+    DistToGarage = ManhattenDistance(GarageFormatted, newPositionsArray, M);
+    DistToGarage = DistToGarage * 0.1;
+    
+    values = sum(minDists, 2) + sum(NeedPickup, 2) + sum(DistToDest, 2) + sum(DropCost,2) + sum(DistToGarage,2);
 end
 
 function [NewPositions] = UpdatePackagePositions(VehiclePos, Carrying, OldPos)
@@ -164,7 +166,7 @@ function [NewPositions] = UpdatePackagePositions(VehiclePos, Carrying, OldPos)
     
     if numCarried > 0
         for i=1:numel(OldPos)
-            [row,col] = find(cellfun(@(x)ismember(i,x),Carrying))
+            [row,col] = find(cellfun(@(x)ismember(i,x),Carrying));
             for j=1:size(row,1)
                newPos = VehiclePos(row(j),col(j));
                NewPositions(row(j), i) = newPos;
