@@ -1,6 +1,4 @@
-function [ path, cost ] = AStar( Vehicles, Packages, Garage, G, M, P )
-    DisplayMap(G, Vehicles, Packages, Garage);
-    
+function [ path, cost ] = AStar( Vehicles, Packages, Garage, G, M, P )    
     numVehicles = length(Vehicles);
     %the max number of options for choices each vehicle can make
     %move in any of 4 directions, stay still, pick up a package, or drop
@@ -17,6 +15,9 @@ function [ path, cost ] = AStar( Vehicles, Packages, Garage, G, M, P )
         PackagesCarried = PriorityQueue{1,3};
         PackagePositions = PriorityQueue{1,4};
         PriorityQueue(1,:) = [];
+        
+        DisplayMap( G, VehiclePositions, PackagePositions, [Packages.destination], Garage )
+
         
         % check to see if we've reached our goal
         done = reachedGoal(VehiclePositions, PackagePositions, [Packages.destination], PackagesCarried, Garage);
