@@ -27,7 +27,7 @@ function [ TotalCost ] = AStar( Vehicles, Packages, Garage, G, M, P )
             CombinedCarrying = cell(maxChoices ^ numVehicles, numVehicles);
             for i=1:numVehicles
 
-               [newChoices, newCarryingList] = generateNewChoices(VehiclePositions(i), PackagesCarried{i}, PackagePositions, G, maxChoices, P);
+               [newChoices, newCarryingList] = generateNewChoices(VehiclePositions(i), PackagesCarried{i}, PackagePositions, Garage, G, maxChoices, P);
 
                eachNumSize = maxChoices^(numVehicles-i);
                numBlocks = maxChoices ^ (i-1);
@@ -65,14 +65,14 @@ function [ TotalCost ] = AStar( Vehicles, Packages, Garage, G, M, P )
             %sort the new queue
             [~, Index_A] = sort(cell2mat(PriorityQueue(:,1)));
             PriorityQueue = PriorityQueue(Index_A,:);
-        end
+        end 
     end
 
 end
 
-function [done] = reachedGoal(Vehicles, PackagesPos, PackageDest, PackagesCarried, Garage)
+function [done] = reachedGoal(VehiclePositions, PackagesPos, PackageDest, PackagesCarried, Garage)
     done = false; 
-    if max(Vehicles - Garage) == 0 
+    if max(abs(VehiclePositions - Garage)) == 0 
         if max(abs(PackagesPos - PackageDest)) == 0
             [~, numCarried] = cellfun(@size, PackagesCarried);
             numCarried = sum(numCarried,2);
@@ -83,16 +83,21 @@ function [done] = reachedGoal(Vehicles, PackagesPos, PackageDest, PackagesCarrie
     end 
 end
 
-function [newChoices, newCarry] = generateNewChoices(CurrentPosition, PackagesCarried, PackagePositions, G, maxSize, P)
+function [newChoices, newCarry] = generateNewChoices(CurrentPosition, PackagesCarried, PackagePositions, Garage, G, maxSize, P)
     newCarry = repmat({PackagesCarried}, maxSize, 1);
     newChoices = zeros(maxSize, 1);
     successors = neighbors(G, CurrentPosition);
     newChoices(1:numel(successors)) = successors;
-    newChoices(5) = CurrentPosition;
+    
+    %we want to add the ability to sit still, but only if 
+    %it's sitting in the garage
+    if CurrentPosition == Garage
+        newChoices(5) = CurrentPosition;
+    end
     
     %add option to pick up package if you're on one
     idxOfPackageAtCurrentPos = find(PackagePositions==CurrentPosition);
-    if(~isempty(idxOfPackageAtCurrentPos) && isempty(find(PackagesCarried==idxOfPackageAtCurrentPos)) && numel(PackagesCarried) < P)
+    if(~isempty(idxOfPackageAtCurrentPos) && isempty(find(PackagesCarried==idxOfPackageAtCurrentPos, 1)) && numel(PackagesCarried) < P)
         newChoices(6) = CurrentPosition;
         newCarry{6} = [PackagesCarried, idxOfPackageAtCurrentPos];
     end
