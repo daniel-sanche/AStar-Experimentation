@@ -28,7 +28,7 @@ function [ Path, TotalCost ] = AStar( numVehicles, Packages, Garage, G, M, P )
             CombinedOptions = zeros(maxChoices ^ numVehicles, numVehicles);
             CombinedCarrying = cell(maxChoices ^ numVehicles, numVehicles);
             for i=1:numVehicles
-               [newChoices, newCarryingList] = generateNewChoices(VehiclePositions(i), PackagesCarried{i}, PackagePositions, Garage, G, maxChoices, P);
+               [newChoices, newCarryingList] = generateNewChoices(VehiclePositions(i), PackagesCarried{i}, PackagePositions, [Packages.destination], Garage, G, maxChoices, P);
 
                eachNumSize = maxChoices^(numVehicles-i);
                numBlocks = maxChoices ^ (i-1);
@@ -86,7 +86,7 @@ function [done] = reachedGoal(VehiclePositions, PackagesPos, PackageDest, Packag
     end 
 end
 
-function [newChoices, newCarry] = generateNewChoices(CurrentPosition, PackagesCarried, PackagePositions, Garage, G, maxSize, P)
+function [newChoices, newCarry] = generateNewChoices(CurrentPosition, PackagesCarried, PackagePositions, PackageDestinations, Garage, G, maxSize, P)
     newCarry = repmat({PackagesCarried}, maxSize, 1);
     newChoices = zeros(maxSize, 1);
     successors = neighbors(G, CurrentPosition);
@@ -109,12 +109,14 @@ function [newChoices, newCarry] = generateNewChoices(CurrentPosition, PackagesCa
         end
         newCarry{6} = [PackagesCarried, PackagesAtPosition];
     end
-    PackagesCarried
     
-    %add option to drop package if you're carrying one
+    %add option to drop package if you're carrying one and you're on it's
+    %destination
     for i=1:numel(PackagesCarried)
-        newChoices(i+6) = CurrentPosition;
-        newCarry{i+6}(i) = [];
+        if PackageDestinations(PackagesCarried(i)) == CurrentPosition
+          newChoices(i+6) = CurrentPosition;
+          newCarry{i+6}(i) = [];
+        end
     end    
 end
 
