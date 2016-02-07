@@ -18,10 +18,6 @@ function Main(M, N, K, P)
     end
 
     G = GridGraphGenerator(M, [1 20], 0);
-    [ Vehicles, Packages, GaragePt  ] = InitPositions(G, N, K);
-
-    [Path, Cost] = AStar( N, Packages, GaragePt, G, M, P )
-
-    output = ['finished in ', num2str(Cost),' turns' ];
-    disp(output);
+    [ Vehicles, Packages, GaragePt, Seed  ] = InitPositions(G, N, K, [11,4,8]);
+    [Path, Cost, Turns] = AStar( N, Packages, GaragePt, G, M, P )
 end
