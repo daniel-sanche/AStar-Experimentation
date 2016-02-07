@@ -7,6 +7,8 @@ function [ Path, TotalCost ] = AStar( numVehicles, Packages, Garage, G, M, P )
     %add new options to the queue
     InitialVehicles = repmat(Garage, numVehicles, 1);
     PriorityQueue = [0, {InitialVehicles}, {repmat({[]}, 1, numVehicles)}, {[Packages.position]}, {0}, {zeros(1,numVehicles)}];
+    DisplayMap( G, cell2mat(PriorityQueue(1,2)), PriorityQueue{1,4}, [Packages.destination], Garage );
+    pause(0.01);
     done = false;
     while ~done
         %take the first choice off the queue
