@@ -4,8 +4,6 @@ function Main(M, N, K, P)
     K = 2;
     P = 1;
 
-    javaaddpath('./javatuples-1.2.jar');
-
     if(M < N*2 + 1)
        error('not enough locations for that many packages (M < N*2 + 1)'); 
     end
