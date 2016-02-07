@@ -10,14 +10,14 @@ function [ Path, TotalCost ] = AStar( numVehicles, Packages, Garage, G, M, P )
     done = false;
     while ~done
         %take the first choice off the queue
-        HerusticValue = PriorityQueue{1,1};
         VehiclePositions = cell2mat(PriorityQueue(1,2));
         PackagesCarried = PriorityQueue{1,3};
         PackagePositions = PriorityQueue{1,4};
         TotalCost = PriorityQueue{1,5};
         Path = PriorityQueue{1,6};
-    %    DisplayMap( G, VehiclePositions, PackagePositions, [Packages.destination], Garage )
-    %    pause(0.01);
+        %update the map
+     %   DisplayMap( G, VehiclePositions, PackagePositions, [Packages.destination], Garage )
+     %   pause(0.01);
         PriorityQueue(1,:) = [];
         
         
@@ -73,6 +73,8 @@ function [ Path, TotalCost ] = AStar( numVehicles, Packages, Garage, G, M, P )
 
 end
 
+%this function is called to check if the goal has been completed
+%returns a bool indicating whether we are done
 function [done] = reachedGoal(VehiclePositions, PackagesPos, PackageDest, PackagesCarried, Garage)
     done = false; 
     if max(abs(VehiclePositions - Garage)) == 0 
@@ -86,6 +88,7 @@ function [done] = reachedGoal(VehiclePositions, PackagesPos, PackageDest, Packag
     end 
 end
 
+%this function returns a list of new ptions from the current state
 function [newChoices, newCarry] = generateNewChoices(CurrentPosition, PackagesCarried, PackagePositions, PackageDestinations, Garage, G, maxSize, P)
     newCarry = repmat({PackagesCarried}, maxSize, 1);
     newChoices = zeros(maxSize, 1);
@@ -117,6 +120,7 @@ function [newChoices, newCarry] = generateNewChoices(CurrentPosition, PackagesCa
     end    
 end
 
+%this function assignes heuristic values to the new states
 function [values] = HeuristicValues(newPositionsArray, packagePositions, PackagesCarried, PackageDests, Garage, M)
     %create a 3d array. Each 3rd D stack represents the distance to a
     %certain package. Each row represents a different decision option. Each column
@@ -187,6 +191,7 @@ function [values] = HeuristicValues(newPositionsArray, packagePositions, Package
     values = sum(FinalHeuristic, 2);
 end
 
+%this function moves the packages that are being carried by vehicles
 function [NewPositions] = UpdatePackagePositions(VehiclePos, Carrying, OldPos)
     numberOptions = size(VehiclePos, 1);
     NewPositions = repmat(OldPos, numberOptions, 1);
