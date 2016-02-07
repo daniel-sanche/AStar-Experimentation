@@ -57,9 +57,11 @@ function [ Path, TotalCost, Turns ] = AStar( numVehicles, Packages, Garage, G, M
             NewPackagePositions = UpdatePackagePositions(CombinedOptions, CombinedCarrying, PackagePositions);
 
             Values = HeuristicValues(CombinedOptions, NewPackagePositions, CombinedCarrying, [Packages.destination], Garage, M);
+            %add extra weight to the heuristic
+            %removes admissability, but achieves a result much faster
+            %Values = (Values * 1.01);
             Values = Values + TotalCost;
-            %Values = Values + CostToHere + 1;
-
+            
             %add to priority queue
             currentLength = size(PriorityQueue,1);
             newLength = currentLength + size(Values,1);
