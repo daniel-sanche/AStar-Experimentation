@@ -22,13 +22,13 @@ function [ Path, TotalCost ] = AStar( numVehicles, Packages, Garage, G, M, P )
         
         
         % check to see if we've reached our goal
-        done = reachedGoal(VehiclePositions, PackagePositions, [Packages.destination], PackagesCarried, Garage);
+        done = ReachedGoal(VehiclePositions, PackagePositions, [Packages.destination], PackagesCarried, Garage);
         if ~done
         
             CombinedOptions = zeros(maxChoices ^ numVehicles, numVehicles);
             CombinedCarrying = cell(maxChoices ^ numVehicles, numVehicles);
             for i=1:numVehicles
-               [newChoices, newCarryingList] = generateNewChoices(VehiclePositions(i), PackagesCarried{i}, PackagePositions, [Packages.destination], Garage, G, maxChoices, P);
+               [newChoices, newCarryingList] = GenerateNewChoices(VehiclePositions(i), PackagesCarried{i}, PackagePositions, [Packages.destination], Garage, G, maxChoices, P);
 
                eachNumSize = maxChoices^(numVehicles-i);
                numBlocks = maxChoices ^ (i-1);
@@ -72,142 +72,3 @@ function [ Path, TotalCost ] = AStar( numVehicles, Packages, Garage, G, M, P )
     end
 
 end
-
-%this function is called to check if the goal has been completed
-%returns a bool indicating whether we are done
-function [done] = reachedGoal(VehiclePositions, PackagesPos, PackageDest, PackagesCarried, Garage)
-    done = false; 
-    if max(abs(VehiclePositions - Garage)) == 0 
-        if max(abs(PackagesPos - PackageDest)) == 0
-            [~, numCarried] = cellfun(@size, PackagesCarried);
-            numCarried = sum(numCarried,2);
-            if numCarried == 0
-                done = true; 
-            end
-        end
-    end 
-end
-
-%this function returns a list of new ptions from the current state
-function [newChoices, newCarry] = generateNewChoices(CurrentPosition, PackagesCarried, PackagePositions, PackageDestinations, Garage, G, maxSize, P)
-    newCarry = repmat({PackagesCarried}, maxSize, 1);
-    newChoices = zeros(maxSize, 1);
-    successors = neighbors(G, CurrentPosition);
-    newChoices(1:numel(successors)) = successors;
-    
-    %we want to add the ability to sit still, but only if 
-    %it's sitting in the garage
-    if CurrentPosition == Garage
-        newChoices(5) = CurrentPosition;
-    end
-    
-    %add option to pick up package if you're on one
-
-    PackagesAtPosition = find(PackagePositions==CurrentPosition);
-    PackagesAtPosition = setdiff(PackagesAtPosition, PackagesCarried);
-    if(~isempty(PackagesAtPosition) && numel(PackagesCarried) < P)
-        newChoices(6) = CurrentPosition;
-        newCarry{6} = [PackagesCarried, PackagesAtPosition];
-    end
-    
-    %add option to drop package if you're carrying one and you're on it's
-    %destination
-    for i=1:numel(PackagesCarried)
-        if PackageDestinations(PackagesCarried(i)) == CurrentPosition
-          newChoices(i+6) = CurrentPosition;
-          newCarry{i+6}(i) = [];
-        end
-    end    
-end
-
-%this function assignes heuristic values to the new states
-function [values] = HeuristicValues(newPositionsArray, packagePositions, PackagesCarried, PackageDests, Garage, M)
-    %create a 3d array. Each 3rd D stack represents the distance to a
-    %certain package. Each row represents a different decision option. Each column
-    %represents a different robot. For each decision, we want to find the
-    %sum of min distances from any robot to each package
-    [rows, cols] = size(newPositionsArray);
-    numPackages = size(packagePositions,2);
-    reshapedPackages = reshape(packagePositions,[rows,1,numPackages]);
-    reshapedPackages = repmat(reshapedPackages, 1,cols,1);
-    
-    vehiclePositions = repmat(newPositionsArray, 1,1,numPackages);
-    
-    distances = ManhattenDistance(vehiclePositions, reshapedPackages, M);
-    
-    %this tells us the minimum distance to each package for each
-    %potential move
-    minDists = min(distances, [], 2);
-    minDists=reshape(minDists, size(minDists,1),numPackages);
-    
-    %add a cost for not being dropped off at the right location
-    %(otherwise the vehicle will continue holding it)
-    [~, numCarried] = cellfun(@size, PackagesCarried);
-    numCarried = sum(numCarried,2);
-    destinationsFormated = repmat(PackageDests, rows, 1);
-    posDiff = abs(packagePositions - destinationsFormated);
-    InPosition = (posDiff == 0);
-    
-    BeingCarried = zeros(rows, numPackages);
-    if sum(numCarried(:)) ~= 0
-        for i=1:numPackages
-            [r,~] = find(cellfun(@(x)ismember(i,x),PackagesCarried));
-            BeingCarried(r,i) = 1; 
-        end
-    end
-    DropCost = ones(rows,numPackages);
-    DropCost(InPosition + ~BeingCarried==2) = 0;
- 
-    %if a package is at its destination, it doesn't matter how close it
-    %is to a vehicle
-    minDists(InPosition==1) = 0;
-    
-    %we also want to add a cost for every package not being carried
-    NeedPickup = ones(rows,numPackages);
-    NeedPickup(BeingCarried==1) = 0;
-    NeedPickup(InPosition==1) = 0;
-    
-    %we also want to add in the distance between the packages and their
-    %destination
-    DistToDest = ManhattenDistance(destinationsFormated, packagePositions, M);
-    
-    %track the distance from the garage to the vehicles
-    GarageFormatted = repmat(Garage, size(newPositionsArray));
-    CarsToGarage = ManhattenDistance(GarageFormatted, newPositionsArray, M);
-    
-    GarageFormatted = repmat(Garage, size(packagePositions));
-    PackagesToGarage = ManhattenDistance(GarageFormatted, packagePositions, M);
-    
-    DestsToGarage = ManhattenDistance(GarageFormatted, destinationsFormated, M);
-    %we don't want to consider the distances for packages or destinations
-    %where the package was already dropped off
-    PackagesToGarage(InPosition==1) = 0;
-    DestsToGarage(InPosition==1) = 0;
-
-    
-    MaxDist = [max(DestsToGarage, [], 2), max(PackagesToGarage,[],2), CarsToGarage];
-    
-    FinalHeuristic = [min(minDists, [], 2), sum(NeedPickup, 2), sum(DistToDest, 2), sum(DropCost,2), max(MaxDist, [], 2)];
-    values = sum(FinalHeuristic, 2);
-end
-
-%this function moves the packages that are being carried by vehicles
-function [NewPositions] = UpdatePackagePositions(VehiclePos, Carrying, OldPos)
-    numberOptions = size(VehiclePos, 1);
-    NewPositions = repmat(OldPos, numberOptions, 1);
-    
-    [~, numCarried] = cellfun(@size, Carrying);
-    numCarried = sum(numCarried(:));
-    
-    if numCarried > 0
-        for i=1:numel(OldPos)
-            [row,col] = find(cellfun(@(x)ismember(i,x),Carrying));
-            for j=1:size(row,1)
-               newPos = VehiclePos(row(j),col(j));
-               NewPositions(row(j), i) = newPos;
-            end
-        end
-    end
-end
-
-

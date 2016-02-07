@@ -1,8 +1,4 @@
 function Main(M, N, K, P)
-    M = 15;
-    N = 2;
-    K = 2;
-    P = 1;
 
     if(M < N*2 + 1)
        error('not enough locations for that many packages (M < N*2 + 1)'); 
