@@ -1,4 +1,4 @@
-function [ Path, TotalCost ] = AStar( numVehicles, Packages, Garage, G, M, P )    
+function [ Path, TotalCost, Turns ] = AStar( numVehicles, Packages, Garage, G, M, P )    
     %the max number of options for choices each vehicle can make
     %move in any of 4 directions, stay still, pick up a package, or drop
     %one of p packages
@@ -10,7 +10,9 @@ function [ Path, TotalCost ] = AStar( numVehicles, Packages, Garage, G, M, P )
     DisplayMap( G, cell2mat(PriorityQueue(1,2)), PriorityQueue{1,4}, [Packages.destination], Garage );
     pause(0.01);
     done = false;
+    Turns = 0;
     while ~done
+        Turns = Turns+1;
         %take the first choice off the queue
         VehiclePositions = cell2mat(PriorityQueue(1,2));
         PackagesCarried = PriorityQueue{1,3};
