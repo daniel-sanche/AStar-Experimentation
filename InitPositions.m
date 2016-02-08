@@ -1,7 +1,4 @@
-function [ Vehicles, Packages, Garage  ] = InitPositions( G, N, K, Seed )
-    if Seed ~= 0
-        rng(Seed)
-    end
+function [ Vehicles, Packages, Garage  ] = InitPositions( G, N, K )
     nodeCount = numnodes(G);
     startPoint = randi([1 nodeCount],1,1);
     Vehicles = repmat(startPoint, 1, N);
