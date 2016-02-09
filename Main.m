@@ -1,4 +1,4 @@
-function Main(M, N, K, P, EdgeRemoval, Seed)
+function Main(M, N, K, P, R, Seed)
     %convert inputs to number values
     if ischar(M)
         M = str2num(M);
@@ -12,8 +12,8 @@ function Main(M, N, K, P, EdgeRemoval, Seed)
     if ischar(P)
         P = str2num(P);
     end
-    if ischar(EdgeRemoval)
-        EdgeRemoval = str2num(EdgeRemoval);
+    if ischar(R)
+        R = str2num(R);
     end
     if ischar(Seed)
         Seed = str2num(Seed);
@@ -28,7 +28,7 @@ function Main(M, N, K, P, EdgeRemoval, Seed)
        error('not enough locations for that many packages (M < N*2 + 1)'); 
     end
 
-    G = GridGraphGenerator(M, [1 20], EdgeRemoval);
+    G = GridGraphGenerator(M, [1 20], R);
     [ Vehicles, Packages, GaragePt  ] = InitPositions(G, N, K);
     [Path, Cost, Turns] = AStar( N, Packages, GaragePt, G, M, P )
 end
