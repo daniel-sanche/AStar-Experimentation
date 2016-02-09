@@ -1,9 +1,10 @@
 function [ G ] = GridGraphGenerator( m, weightRange, destructionFactor )
-
+    %generates a grid graph for the world
     n = ceil(sqrt(m));
 
     A = zeros(n*n,n*n);
 
+    %create new weigheted edges
     for i=1:n:n*n
         for j=i:i+n-2
             weight = randi(weightRange,1,1);

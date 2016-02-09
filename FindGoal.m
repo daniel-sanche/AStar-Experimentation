@@ -1,5 +1,7 @@
 function [ Dest ] = FindGoal( Vehicle, Packages, Goals, P, M )
-
+    %assigns a new goal to a vehicle. Goals will be either package
+    %positions, package destinations, or the garage
+    
     holdingCount = length(Vehicle.packages);
     PossibleDestinations = [];
 
