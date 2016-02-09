@@ -27,6 +27,9 @@ function Main( M, N, K, P, R, minW, maxW, S, D )
     if ischar(minW)
         minW = str2num(minW);
     end
+    if ischar(D)
+        D = str2num(D);
+    end
     
     %set the random seed value if there is one
     if S ~= 0
