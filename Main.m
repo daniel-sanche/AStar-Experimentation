@@ -12,6 +12,12 @@ function Main(M, N, K, P, EdgeRemoval, Seed)
     if ischar(P)
         P = str2num(P);
     end
+    if ischar(EdgeRemoval)
+        EdgeRemoval = str2num(EdgeRemoval);
+    end
+    if ischar(Seed)
+        Seed = str2num(Seed);
+    end
     
     %set the random seed value if there is one
     if Seed ~= 0
