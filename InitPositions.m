@@ -1,4 +1,5 @@
 function [ Vehicles, Packages, Garage  ] = InitPositions( G, N, K )
+  %create the initial positions for packages and the garage
 
     nodeCount = numnodes(G);
 

@@ -1,4 +1,6 @@
 function [  ] = DisplayMap( G, Vehicles, Packages, Garage )
+%displays the graph along with the positions of vehicles, packages,
+%destinations, and the garage
 
 h = plot(G);
 
