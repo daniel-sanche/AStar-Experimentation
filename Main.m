@@ -1,4 +1,4 @@
-function Main(M, N, K, P, R, Seed)
+function Main(M, N, K, P, R, Seed, D)
     %convert inputs to number values
     if ischar(M)
         M = str2num(M);
@@ -18,6 +18,9 @@ function Main(M, N, K, P, R, Seed)
     if ischar(Seed)
         Seed = str2num(Seed);
     end
+    if ischar(D)
+        D = str2num(D);
+    end
     
     %set the random seed value if there is one
     if Seed ~= 0
@@ -30,5 +33,5 @@ function Main(M, N, K, P, R, Seed)
 
     G = GridGraphGenerator(M, [1 20], R);
     [ Vehicles, Packages, GaragePt  ] = InitPositions(G, N, K);
-    [Path, Cost, Turns] = AStar( N, Packages, GaragePt, G, M, P )
+    [Path, Cost, Turns] = AStar( N, Packages, GaragePt, G, M, P, D )
 end

@@ -1,4 +1,4 @@
-function [ Path, TotalCost, Turns ] = AStar( numVehicles, Packages, Garage, G, M, P )    
+function [ Path, TotalCost, Turns ] = AStar( numVehicles, Packages, Garage, G, M, P, D )    
     %the max number of options for choices each vehicle can make
     %move in any of 4 directions, stay still, pick up a package, or drop
     %one of p packages
@@ -20,8 +20,10 @@ function [ Path, TotalCost, Turns ] = AStar( numVehicles, Packages, Garage, G, M
         TotalCost = PriorityQueue{1,5};
         Path = PriorityQueue{1,6};
         %update the map
-     %   DisplayMap( G, VehiclePositions, PackagePositions, [Packages.destination], Garage )
-     %   pause(0.01);
+        if D
+            DisplayMap( G, VehiclePositions, PackagePositions, [Packages.destination], Garage )
+           pause(0.001);
+        end
         PriorityQueue(1,:) = [];
         
         
